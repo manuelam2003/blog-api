@@ -12,7 +12,11 @@ router.get("/", function (req, res, next) {
   res.json("hola");
 });
 
-router.post("/users", user_controller.create_user);
+router.post(
+  "/users",
+  passport.authenticate("jwt", { session: false }),
+  user_controller.create_user
+);
 
 // * AUTH METHODS
 
@@ -22,11 +26,7 @@ router.get("/login-get", auth_controller.login_get);
 
 // * POSTS METHODS
 
-router.get(
-  "/posts",
-  passport.authenticate("jwt", { session: false }),
-  post_controller.allPosts
-);
+router.get("/posts", post_controller.allPosts);
 
 router.get("/posts/:postId", post_controller.singlePost);
 
@@ -36,9 +36,17 @@ router.post(
   post_controller.createPost
 );
 
-router.put("/posts/:postId", post_controller.updatePost);
+router.put(
+  "/posts/:postId",
+  passport.authenticate("jwt", { session: false }),
+  post_controller.updatePost
+);
 
-router.delete("/posts/:postId", post_controller.deletePost);
+router.delete(
+  "/posts/:postId",
+  passport.authenticate("jwt", { session: false }),
+  post_controller.deletePost
+);
 
 // * COMMENT METHODS
 
@@ -56,7 +64,14 @@ router.post(
 
 router.delete(
   "/posts/:postId/comments/:commentId",
+  passport.authenticate("jwt", { session: false }),
   comment_controller.deleteSingleComment
+);
+
+router.put(
+  "/posts/:postId/comments/:commentId",
+  passport.authenticate("jwt", { session: false }),
+  comment_controller.updateSingleComment
 );
 
 module.exports = router;

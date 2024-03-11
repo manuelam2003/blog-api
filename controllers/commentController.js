@@ -72,3 +72,35 @@ exports.deleteSingleComment = asyncHandler(async (req, res, next) => {
     });
   }
 });
+
+// TODO: ver si funciona bien
+exports.updateSingleComment = [
+  body("text", "Text must not be empty and at least 3 characters long")
+    .trim()
+    .isLength({ min: 3 })
+    .escape(),
+  asyncHandler(async (req, res, next) => {
+    const errors = validationResult(req);
+
+    let update = { timestamp: Date.now(), text: req.body.text };
+    if (!errors.isEmpty()) {
+      res.status(400).json(errors.array());
+    } else {
+      const comment = await Comment.findByIdAndUpdate(
+        req.params.commentId,
+        update,
+        { new: true }
+      );
+      if (!comment) {
+        res
+          .status(404)
+          .json({ msg: `No comment with id ${req.params.commentId}` });
+      } else {
+        return res.status(200).json({
+          message: `Updated comment with id ${req.params.commentId} and updated from ${req.params.postId}`,
+          comment: comment,
+        });
+      }
+    }
+  }),
+];
